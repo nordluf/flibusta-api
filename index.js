@@ -2,7 +2,7 @@ var app = require('koa')();
 var router = require('koa-router')();
 var request = require('request');
 var unzip = require('unzip');
-var ORIGIN = 'http://flibusta.net';
+var ORIGIN = 'http://flibusta.is';
 var SITE_URL = process.env.NODE_ENV === 'production' ?
 	'http://flibusta-api.herokuapp.com' :
 	'http://127.0.0.1:3000';
@@ -37,8 +37,9 @@ function getUnzip(url, format) {
 
 function* search() {
 	var formats = ['mobi', 'fb2', 'epub', 'txt'];
-	var page = yield get(`${ORIGIN}/booksearch?ask=${encodeURIComponent(this.query.name)}`);
-	var re = /<a href="(\/b\/([^"]+))">([^<]+)<\/a>/g;
+	var raw_page = yield get(`${ORIGIN}/booksearch?ask=${encodeURIComponent(this.query.name)}`);
+	var page = strip(raw_page);
+	var re = /<a href="(\/b\/([^"]+))">([^<]+)<\/a>/gi;
 	var results = [], match, pages, url, bookId;
 
 	while((match = re.exec(page))) {
@@ -73,4 +74,13 @@ function* download(ctx, next) {
 	this.set('Content-Disposition', `attachment; filename=${entry.path}`);
 	this.set('Content-Type', 'application/octet-stream; charset=utf-8');
 	this.body = entry;
+}
+
+function strip(html)
+{
+	html = html.replace(/<b>/g, "");
+	html = html.replace(/<\/b>/g, "");
+	html = html.replace(/<span style="background-color: #[a-zA-Z0-9]+">/g, "");
+	html = html.replace(/<\/span>/g, "");
+	return html;
 }
