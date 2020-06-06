@@ -9,6 +9,7 @@ var SITE_URL = process.env.NODE_ENV === 'production' ?
 
 router.get('/search', search);
 router.get('/download/:id/:format', download);
+router.get('/info', getBookInfo);
 app.use(router.routes());
 app.listen(process.env.PORT || 3000);
 
@@ -59,6 +60,33 @@ function* search() {
 	this.body = results;
 }
 
+function* getBookInfo() {
+	let raw_page = yield get(`${ORIGIN}/b/${encodeURIComponent(this.query.id)}`);
+	let page = strip(raw_page);
+	let result = {};
+
+	console.log(page)
+
+	// Weird Match :)
+	result['cover'] = ORIGIN + page
+		.match(/src="\/i\/[0-9]+\/[0-9]+\/[a-zA-Z0-9.]+"/g)[0]
+		.replace('src="', "")
+		.split("")
+		.reverse()
+		.join("")
+		.replace('"', "")
+		.split("")
+		.reverse()
+		.join("");
+
+	result['pages'] = Number.parseInt(page
+		.match(/<span style=size>[a-zA-Z0-9., ]+/g)[0]
+		.replace(/<span style=size>[0-9A-Za-z]+,/g, '')
+		.trim());
+
+	this.body = result;
+}
+
 function* download(ctx, next) {
 	var url = `${ORIGIN}/b/${this.params.id}/${this.params.format}`;
 	if (this.params.format === 'mobi') {
@@ -78,9 +106,12 @@ function* download(ctx, next) {
 
 function strip(html)
 {
+	// Remove unnecessary HTML tags in book link
 	html = html.replace(/<b>/g, "");
 	html = html.replace(/<\/b>/g, "");
 	html = html.replace(/<span style="background-color: #[a-zA-Z0-9]+">/g, "");
 	html = html.replace(/<\/span>/g, "");
+	// Remove the sidebar, because there are unnecessary links
+	html = html.replace(/<div id="sidebar-right" class="sidebar">[^]+<\/div>/g, "");
 	return html;
 }
