@@ -1,3 +1,14 @@
+/*
+* 							Warning!
+*
+* All information that is taken from the Flibusta site is parsed,
+* so I can't guarantee that everything will work,
+* but at the time of the last commit all points were available.
+*
+*
+* */
+
+
 var app = require('koa')();
 var router = require('koa-router')();
 var request = require('request');
@@ -65,7 +76,12 @@ function* getBookInfo() {
 	let page = strip(raw_page);
 	let result = {};
 
-	console.log(page)
+	result['title'] = page
+		.match(/<h1 class="title">[a-zA-Zа-яА-ЯёЁ0-9!$%^&*()_+|~=`{}\[\]:";'<>?,.\/ ]+<\/h1>/g)[0]
+		.replace(/<h1 class="title">/g, '')
+		.replace(/<\/h1>/g, '')
+		.replace(/(\(fb2\)|\(epub\)|\(mobi\))/, '')
+		.trim();
 
 	// Weird Match :)
 	result['cover'] = ORIGIN + page
@@ -83,6 +99,28 @@ function* getBookInfo() {
 		.match(/<span style=size>[a-zA-Z0-9., ]+/g)[0]
 		.replace(/<span style=size>[0-9A-Za-z]+,/g, '')
 		.trim());
+
+	result['authors'] = [];
+
+	page.match(/<a href="\/a\/[0-9]+">[a-zA-Zа-яА-ЯёЁ .]+<\/a>/g).forEach(raw_author => {
+		let author = raw_author
+			.replace(/<a href="\/a\/[0-9]+">/, '')
+			.replace(/<\/a>/, '');
+
+		if (author != 'Автор Неизвестен') {
+			return result['authors'].push(author)
+		}
+	});
+
+	result['genre'] = page
+		.match(/<a href="\/g\/[0-9]+" class="genre" name="[a-zA-Z0-9_]+">[a-zA-Zа-яА-ЯёЁ .]+<\/a>/g)[0]
+		.replace(/<a href="\/g\/[0-9]+" class="genre" name="[a-zA-Z0-9_]+">/, '')
+		.replace(/<\/a>/, '');
+
+	result['added'] = new Date(toCorrectDate(page
+		.match(/Добавлена: [0-9]+.[0-9]+.[0-9]+/g)[0]
+		.replace(/Добавлена:/g, '')
+		.trim())).toDateString();
 
 	this.body = result;
 }
@@ -102,6 +140,21 @@ function* download(ctx, next) {
 	this.set('Content-Disposition', `attachment; filename=${entry.path}`);
 	this.set('Content-Type', 'application/octet-stream; charset=utf-8');
 	this.body = entry;
+}
+
+function toCorrectDate(date) {
+	let numbers = date.split('.');
+	let correct = [];
+
+	if (numbers[0] > 12) {
+		correct.push(numbers[1]);
+		correct.push(numbers[0]);
+		correct.push(numbers[2]);
+	} else {
+		correct = numbers;
+	}
+
+	return correct.join('.');
 }
 
 function strip(html)
