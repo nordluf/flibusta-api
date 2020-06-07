@@ -71,6 +71,24 @@ function* search() {
 	this.body = results;
 }
 
+/*
+*
+* Path: http://your.path/info?id=<book_id>
+*
+* Returns the view object:
+*	{
+*		"title": String,
+*		"cover": String (URL on Image),
+*		"pages": Int,
+*		"authors": [
+*			String
+*		],
+*		"genre": String,
+*		"added": String (UTC Format)
+*	}
+*
+* */
+
 function* getBookInfo() {
 	let raw_page = yield get(`${ORIGIN}/b/${encodeURIComponent(this.query.id)}`);
 	let page = strip(raw_page);
@@ -120,7 +138,7 @@ function* getBookInfo() {
 	result['added'] = new Date(toCorrectDate(page
 		.match(/Добавлена: [0-9]+.[0-9]+.[0-9]+/g)[0]
 		.replace(/Добавлена:/g, '')
-		.trim())).toDateString();
+		.trim())).toUTCString();
 
 	this.body = result;
 }
