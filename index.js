@@ -90,9 +90,9 @@ function* search() {
 * */
 
 function* getBookInfo() {
-	let raw_page = yield get(`${ORIGIN}/b/${encodeURIComponent(this.query.id)}`);
-	let page = strip(raw_page);
-	let result = {};
+	var raw_page = yield get(`${ORIGIN}/b/${encodeURIComponent(this.query.id)}`);
+	var page = strip(raw_page);
+	var result = {};
 
 	result['title'] = page
 		.match(/<h1 class="title">[a-zA-Zа-яА-ЯёЁ0-9!$%^&*()_+|~=`{}\[\]:";'<>?,.\/ ]+<\/h1>/g)[0]
@@ -121,7 +121,7 @@ function* getBookInfo() {
 	result['authors'] = [];
 
 	page.match(/<a href="\/a\/[0-9]+">[a-zA-Zа-яА-ЯёЁ .]+<\/a>/g).forEach(raw_author => {
-		let author = raw_author
+		var author = raw_author
 			.replace(/<a href="\/a\/[0-9]+">/, '')
 			.replace(/<\/a>/, '');
 
@@ -161,8 +161,8 @@ function* download(ctx, next) {
 }
 
 function toCorrectDate(date) {
-	let numbers = date.split('.');
-	let correct = [];
+	var numbers = date.split('.');
+	var correct = [];
 
 	if (numbers[0] > 12) {
 		correct.push(numbers[1]);
