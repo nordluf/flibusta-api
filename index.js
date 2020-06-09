@@ -13,6 +13,8 @@ var app = require('koa')();
 var router = require('koa-router')();
 var request = require('request');
 var unzip = require('unzip');
+var jsdom = require('jsdom');
+var { JSDOM } = jsdom;
 var ORIGIN = 'http://flibusta.is';
 var SITE_URL = process.env.NODE_ENV === 'production' ?
 	'http://flibustapi.herokuapp.com' :
@@ -79,11 +81,14 @@ function* search() {
 *	{
 *		"title": String,
 *		"cover": String (URL on Image),
+* 		"size": Int (In KB)
 *		"pages": Int,
 *		"authors": [
 *			String
 *		],
-*		"genre": String,
+*		"genres": [
+*			String
+*		],,
 *		"added": String (UTC Format)
 *	}
 *
@@ -92,34 +97,21 @@ function* search() {
 function* getBookInfo() {
 	var raw_page = yield get(`${ORIGIN}/b/${encodeURIComponent(this.query.id)}`);
 	var page = strip(raw_page);
+	var { document } = new JSDOM(raw_page).window;
 	var result = {};
 
-	result['title'] = page
-		.match(/<h1 class="title">[a-zA-Zа-яА-ЯёЁ0-9!$%^&*()_+|~=`{}\[\]:";'<>?,.\/ ]+<\/h1>/g)[0]
-		.replace(/<h1 class="title">/g, '')
-		.replace(/<\/h1>/g, '')
+	result['title'] = document.querySelector("h1.title").textContent
 		.replace(/(\(fb2\)|\(epub\)|\(mobi\))/, '')
 		.trim();
 
-	// Weird Match :)
-	result['cover'] = ORIGIN + page
-		.match(/src="\/i\/[0-9]+\/[0-9]+\/[a-zA-Z0-9.]+"/g)[0]
-		.replace('src="', "")
-		.split("")
-		.reverse()
-		.join("")
-		.replace('"', "")
-		.split("")
-		.reverse()
-		.join("");
+	var cover = document.querySelector('img[title="Cover image"]') != null ? ORIGIN + document.querySelector('img[title="Cover image"]').getAttribute('src') : "shorturl.at/bfoxU";
+	result['cover'] = cover;
 
-	result['pages'] = Number.parseInt(page
-		.match(/<span style=size>[a-zA-Z0-9., ]+/g)[0]
-		.replace(/<span style=size>[0-9A-Za-z]+,/g, '')
-		.trim());
+	var sizeLength = document.querySelector('span[style*="size"]').textContent.split(',');
+	result['size'] = sizeLength[0].replace('K', '')*1;
+	result['pages'] = sizeLength[1].replace('с.', '').trim()*1;
 
 	result['authors'] = [];
-
 	page.match(/<a href="\/a\/[0-9]+">[a-zA-Zа-яА-ЯёЁ .]+<\/a>/g).forEach(raw_author => {
 		var author = raw_author
 			.replace(/<a href="\/a\/[0-9]+">/, '')
@@ -130,10 +122,9 @@ function* getBookInfo() {
 		}
 	});
 
-	result['genre'] = page
-		.match(/<a href="\/g\/[0-9]+" class="genre" name="[a-zA-Z0-9_]+">[a-zA-Zа-яА-ЯёЁ .]+<\/a>/g)[0]
-		.replace(/<a href="\/g\/[0-9]+" class="genre" name="[a-zA-Z0-9_]+">/, '')
-		.replace(/<\/a>/, '');
+	var genres = [];
+	document.querySelectorAll('a.genre').forEach(genre => {if (genre.textContent != undefined) genres.push(genre.textContent)});
+	result['genres'] = genres;
 
 	result['added'] = new Date(toCorrectDate(page
 		.match(/Добавлена: [0-9]+.[0-9]+.[0-9]+/g)[0]
