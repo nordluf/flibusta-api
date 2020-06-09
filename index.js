@@ -15,14 +15,14 @@ var request = require('request');
 var unzip = require('unzip');
 var ORIGIN = 'http://flibusta.is';
 var SITE_URL = process.env.NODE_ENV === 'production' ?
-	'http://flibusta-api.herokuapp.com' :
-	'http://127.0.0.1:3000';
+	'http://flibustapi.herokuapp.com' :
+	'http://127.0.0.1:4000';
 
 router.get('/search', search);
 router.get('/download/:id/:format', download);
 router.get('/info', getBookInfo);
 app.use(router.routes());
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT || 4000);
 
 function get(url) {
 	return cb => request(url, function (err, _, body) {
