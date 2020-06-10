@@ -101,7 +101,7 @@ function* getBookInfo() {
 	var result = {};
 
 	result['title'] = document.querySelector("h1.title").textContent
-		.replace(/(\(fb2\)|\(epub\)|\(mobi\))/, '')
+		.replace(/(\(fb2\)|\(epub\)|\(mobi\)|\(pdf\)|\(txt\))/, '')
 		.trim();
 
 	var cover = document.querySelector('img[title="Cover image"]') != null ? ORIGIN + document.querySelector('img[title="Cover image"]').getAttribute('src') : "https://dhmckee.com/wp-content/uploads/2018/11/defbookcover-min.jpg";
