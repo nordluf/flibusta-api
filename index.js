@@ -15,16 +15,18 @@ var request = require('request');
 var unzip = require('unzip');
 var jsdom = require('jsdom');
 var { JSDOM } = jsdom;
+const dotenv = require('dotenv');
+dotenv.config();
 var ORIGIN = 'http://flibusta.is';
 var SITE_URL = process.env.NODE_ENV === 'production' ?
-	'http://flibustapi.herokuapp.com' :
-	'http://127.0.0.1:4000';
+	process.env.URL_PROD :
+	process.env.URL_DEV;
 
 router.get('/search', search);
 router.get('/download/:id/:format', download);
 router.get('/info', getBookInfo);
 app.use(router.routes());
-app.listen(process.env.PORT || 4000);
+app.listen(process.env.PORT);
 
 function get(url) {
 	return cb => request(url, function (err, _, body) {
