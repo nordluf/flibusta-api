@@ -107,10 +107,10 @@ Returns a ready-made file for download.
 
 Here's an example.
 
-Searching for the phrase "Darth Plegas."
+Searching for the phrase "Дарт Плэгас"
 
 ```console
-https://flibustapi.herokuapp.com/search?name=Darth Plegas
+https://flibustapi.herokuapp.com/search?name=Дарт Плэгас
 ```
 
 Gives us back an array with one element:
