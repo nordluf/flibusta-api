@@ -1,3 +1,12 @@
+## Documentation
+
+You can navigate through the documentation using this list:
+
+* [Installation](https://github.com/XJIEBA/flibusta-api#installation)
+* [Schema](https://github.com/XJIEBA/flibusta-api#schema)
+* [Example](https://github.com/XJIEBA/flibusta-api#example)
+* [Working API](https://github.com/XJIEBA/flibusta-api#working-api)
+
 ## Installation
 
 To run this API on your computer or on your own server, you need to clone the repository and then set all dependencies:
@@ -147,10 +156,10 @@ And the request for information about this book will give us the next line:
 	"size": 1646,
 	"pages": 443,
 	"authors": [
-			"Джеймс Лучено"
+		"Джеймс Лучено"
 	],
 	"genres": [
-			"Космическая фантастика"
+		"Космическая фантастика"
 	],
 	"added": "Fri, 10 Feb 2012 00:00:00 GMT"
 }
