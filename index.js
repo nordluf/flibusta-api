@@ -104,12 +104,12 @@ function* getBookInfo() {
 		.replace(/(\(fb2\)|\(epub\)|\(mobi\))/, '')
 		.trim();
 
-	var cover = document.querySelector('img[title="Cover image"]') != null ? ORIGIN + document.querySelector('img[title="Cover image"]').getAttribute('src') : "shorturl.at/bfoxU";
+	var cover = document.querySelector('img[title="Cover image"]') != null ? ORIGIN + document.querySelector('img[title="Cover image"]').getAttribute('src') : "https://dhmckee.com/wp-content/uploads/2018/11/defbookcover-min.jpg";
 	result['cover'] = cover;
 
-	var sizeLength = document.querySelector('span[style*="size"]').textContent.split(',');
-	result['size'] = sizeLength[0].replace('K', '')*1;
-	result['pages'] = sizeLength[1].replace('с.', '').trim()*1;
+	var sizeLength = document.querySelector('span[style*="size"]').textContent.split(',').map(param => param == undefined ? null : param);
+	result['size'] = sizeLength[0] == null ? null : sizeLength[0].replace('K', '')*1;
+	result['pages'] = sizeLength[1] == null ? null : sizeLength[1].replace('с.', '').trim()*1;
 
 	result['authors'] = [];
 	page.match(/<a href="\/a\/[0-9]+">[a-zA-Zа-яА-ЯёЁ .]+<\/a>/g).forEach(raw_author => {
