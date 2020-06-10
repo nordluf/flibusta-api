@@ -34,31 +34,31 @@ This point returns an array that has the following form:
 
 ```javascript
 {
-	"url." "String."
-	"bookId": "String."
-	"links." [
+	"url": "String",
+	"bookId": "String",
+	"links": [
 		{
-			"format." "mobi."
-			"url." "String."
-			"downloadUrl." "String"
+			"format": "mobi",
+			"url": "String",
+			"downloadUrl": "String"
 		},
 		{
-			"format." "fb2."
-			"url." "String."
-			"downloadUrl." "String"
+			"format": "fb2",
+			"url": "String",
+			"downloadUrl": "String"
 		},
 		{
-			"format." "epub."
-			"url." "String."
-			"downloadUrl." "String"
+			"format": "epub",
+			"url": "String",
+			"downloadUrl": "String"
 		},
 		{
-			"format." "txt."
-			"url." "String."
-			"downloadUrl." "String"
+			"format": "txt",
+			"url": "String",
+			"downloadUrl": "String"
 		}
 	],
-	"name": "Kenobi."
+	"name": "String"
 }
 ```
 
@@ -72,15 +72,15 @@ This point returns an array that has the following form:
 
 ```javascript
 {
-	"title." "String."
-	"cover." "String."
+	"title": "String",
+	"cover": "String",
 	"size": Int or null,
-	"pages." Int or null,
-	"authors." [
-		"String
+	"pages": Int or null,
+	"authors": [
+		"String"
 	],
-	"genres." [
-		"String
+	"genres": [
+		"String"
 	],
 	"added": "String" (UTC Format)
 }
@@ -93,3 +93,69 @@ GET /download/<id books>/<format name>
 ```
 
 Returns a ready-made file for download.
+
+## Example
+
+Here's an example.
+
+Searching for the phrase "Darth Plegas."
+
+```console
+https://flibustapi.herokuapp.com/search?name=Darth Plegas
+```
+
+Gives us back an array with one element:
+
+```javascript
+[
+	{
+		"url": "http://flibusta.is/b/297929",
+		"bookId": "297929",
+			"links": [
+				{
+					"format": "mobi",
+					"url": "http://flibusta.is/b/297929/mobi",
+					"downloadUrl": "http://flibustapi.herokuapp.com/download/297929/mobi"
+				},
+				{
+					"format": "fb2",
+					"url": "http://flibusta.is/b/297929/fb2",
+					"downloadUrl": "http://flibustapi.herokuapp.com/download/297929/fb2"
+				},
+				{
+					"format": "epub",
+					"url": "http://flibusta.is/b/297929/epub",
+					"downloadUrl": "http://flibustapi.herokuapp.com/download/297929/epub"
+				},
+				{
+					"format": "txt",
+					"url": "http://flibusta.is/b/297929/txt",
+					"downloadUrl": "http://flibustapi.herokuapp.com/download/297929/txt"
+				}
+			],
+		"name": "Дарт Плэгас"
+	}
+]
+```
+
+And the request for information about this book will give us the next line:
+
+```javascript
+{
+	"title": "Дарт Плэгас",
+	"cover": "http://flibusta.is/i/29/297929/cover.jpg",
+	"size": 1646,
+	"pages": 443,
+	"authors": [
+			"Джеймс Лучено"
+	],
+	"genres": [
+			"Космическая фантастика"
+	],
+	"added": "Fri, 10 Feb 2012 00:00:00 GMT"
+}
+```
+
+## Working API
+
+You can already use this API by domain: flibustapi.herokuapp.com
