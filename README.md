@@ -60,6 +60,7 @@ This point returns an array that has the following form:
 	],
 	"name": "Kenobi."
 }
+```
 
 The second point is responsible for the information about the book, is spelled out:
 
