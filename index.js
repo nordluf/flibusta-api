@@ -55,7 +55,7 @@ function* search() {
 	var formats = ['mobi', 'fb2', 'epub', 'txt'];
 	var raw_page = yield get(`${ORIGIN}/booksearch?ask=${encodeURIComponent(this.query.name)}`);
 	var page = strip(raw_page);
-	var re = /<a href="(\/b\/([^"]+))">([^<]+)<\/a>/gi;
+	var re = /<a href="(\/b\/([^"]+))">([^<]+)<\/a>\s+-\s+<a href="\/a\/[^"]+">([^<]+)<\/a>/gi;
 	var results = [], match, pages, url, bookId;
 
 	while((match = re.exec(page))) {
@@ -69,6 +69,7 @@ function* search() {
 				downloadUrl: SITE_URL + '/download/' + bookId + '/' + format
 			})),
 			name: match[3],
+			author: match[4],
 		});
 	}
 
@@ -109,7 +110,7 @@ function* getBookInfo() {
 	var cover = document.querySelector('img[title="Cover image"]') != null ? ORIGIN + document.querySelector('img[title="Cover image"]').getAttribute('src') : "https://dhmckee.com/wp-content/uploads/2018/11/defbookcover-min.jpg";
 	result['cover'] = cover;
 
-	var sizeLength = document.querySelector('span[style*="size"]').textContent.split(',').map(param => param == undefined ? null : param);
+	var sizeLength = document.querySelector('span[style*="size"]').textContent.split(',').map(param => param === undefined ? null : param);
 	result['size'] = sizeLength[0] == null ? null : sizeLength[0].replace('K', '')*1;
 	result['pages'] = sizeLength[1] == null ? null : sizeLength[1].replace('с.', '').trim()*1;
 
@@ -119,13 +120,13 @@ function* getBookInfo() {
 			.replace(/<a href="\/a\/[0-9]+">/, '')
 			.replace(/<\/a>/, '');
 
-		if (author != 'Автор Неизвестен') {
+		if (author !== 'Автор Неизвестен') {
 			return result['authors'].push(author)
 		}
 	});
 
 	var genres = [];
-	document.querySelectorAll('a.genre').forEach(genre => {if (genre.textContent != undefined) genres.push(genre.textContent)});
+	document.querySelectorAll('a.genre').forEach(genre => {if (genre.textContent !== undefined) genres.push(genre.textContent)});
 	result['genres'] = genres;
 
 	result['added'] = new Date(toCorrectDate(page
